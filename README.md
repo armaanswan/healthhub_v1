@@ -35,7 +35,7 @@ HealthHub will provide the following functionalities:
 4. **Admin Functions**
 - Admins can create and manage doctor/staff accounts.
 - Admins can verify patient accounts.
-- Admins can generate and download reports on system usage, tests performed, and other key metrics.
+- Admins can generate monthly and yearly health reports.
 5. **Notifications**
 - Patients should be notified when test results are available.
 - Admins should be notified when new patients register and are awaiting approval.
@@ -61,17 +61,18 @@ HealthHub will provide the following functionalities:
 
 #### Reliability:
 - The system should be robust enough to recover from common user errors (e.g., incorrect login attempts).
-- Automatic backup of the database must be scheduled daily.
+- == Automatic backup of the database must be scheduled daily ==.
 
 #### Maintainability:
 - The system should be modular, allowing easy updates and maintenance.
 - Proper documentation for both frontend and backend should be maintained for future developers.
 
 ## Logical Database Requirements
-**The system will use MongoDB to store information such as:**
+The system will use MongoDB to store information such as:
 - **Users Collection:** Includes patients, doctors, staff, and administrators. Each user will have a role, contact info, and login credentials.
 - **Test Results Collection:** Stores test prescriptions, test types, results, and relevant documents.
 - **Appointments Collection (future extension):** This will store information related to patient appointments (if implemented in future versions).
-**Data Relationships:**
+
+Data Relationships:
 - Each Patient will be linked to multiple Test Results.
 - Doctors and Staff will be linked to the Patients they manage.
