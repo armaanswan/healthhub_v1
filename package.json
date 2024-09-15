@@ -1,0 +1,24 @@
+{
+  "name": "healthhub_v1",
+  "version": "1.0.0",
+  "description": "HealthHub is designed to be locally hosted within the clinic's network, enabling multiple roles (patients, doctors, staff, administrators) to access and manage their respective responsibilities. The system aims to replace manual record-keeping and test result management with a digital solution that is more efficient and secure. The system will consist of:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
