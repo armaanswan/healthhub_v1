@@ -76,7 +76,7 @@ app.delete('/patients/:id', async(req, res) => {
     }
 })
 
-mongoose.connect('')
+mongoose.connect('mongodb+srv://SejiLamina:20Jessie02mg%2E@sejilaminaapi.2c8i9.mongodb.net/?retryWrites=true&w=majority&appName=SejiLaminaAPI')
   .then(() => {
     console.log('MongoDB Connected...')
     app.listen(3000, () => {
