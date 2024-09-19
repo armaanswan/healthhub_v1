@@ -1,9 +1,7 @@
 const express = require("express");
+const usersRouter = require("./user.controllers");
 const router = express.Router();
 
-/* GET home page. */
-router.get("/", function (req, res, next) {
-  res.json({ message: "Welcome to the Home Page!" });
-});
+router.use("/users", usersRouter);
 
 module.exports = router;
