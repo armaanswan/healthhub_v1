@@ -5,7 +5,7 @@ const db = require("../lib/db");
 const User = db.User;
 
 //this will authenticate the user credentials
-async function authenticate({ email, password }) {
+async function login({ email, password }) {
   //find the user using email
 
   const user = await User.findOne({ email });
@@ -72,7 +72,7 @@ async function deleteUser(id) {
 }
 
 module.exports = {
-  authenticate,
+  login,
   getAll,
   getById,
   createUser,

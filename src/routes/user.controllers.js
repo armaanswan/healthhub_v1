@@ -5,7 +5,7 @@ const Role = require("../lib/role");
 const jwt = require("../lib/jwt");
 
 // Routes
-router.post("/authenticate", authenticate);
+router.post("/login", login);
 router.post("/register", register);
 router.get("/", jwt(Role.Admin), getAllUsers);
 router.get("/current", jwt(), getCurrentUser);
@@ -16,9 +16,9 @@ router.delete("/:id", deleteUser);
 module.exports = router;
 
 // Route functions
-function authenticate(req, res, next) {
+function login(req, res, next) {
   userServices
-    .authenticate(req.body)
+    .login(req.body)
     .then((user) => {
       console.log(user);
       user
