@@ -1,4 +1,4 @@
-# Introduction
+# Introduction Changed
 
 HealthHub is designed to be locally hosted within the clinic's network, enabling multiple roles (patients, doctors, staff, administrators) to access and manage their respective responsibilities. The system aims to replace manual record-keeping and test result management with a digital solution that is more efficient and secure. The system will consist of:
 
