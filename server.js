@@ -1,6 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const Patient = require('./models/patientModel')
+const User = require('./models/usersModel')
 const app = express()
 
 app.use(express.json())
@@ -11,71 +11,63 @@ app.get('/', (req, res) => {
     res.send('Hello Node API')
 })
 
-app.get('/blog', (req, res) => {
-    res.send('Hello Blog. My Name is Jessie')
-})
-
-app.get('/patients', async(req, res) => {
+// Users routes
+app.get('/users', async (req, res) => {
     try {
-        const patients = await Patient.find();
-        res.status(200).json(patients);
+        const users = await User.find();
+        res.status(200).json(users);
     } catch (error) {
-        console.log(error.message)
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
-})
+});
 
-app.get('/patients/:id', async(req, res) => {
+app.get('/users/:id', async (req, res) => {
     try {
-        const {id} = req.params;
-        const patient = await Patient.findById(id);
-        res.status(200).json(patient);
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-})
-
-app.post('/patients', async(req, res) => {
-    try {
-        const patient = await Patient.create(req.body)
-        res.status(200).json(patient);
-    } catch (error) {
-        console.log(error.message)
-        res.status(500).json({message: error.message})
-    }
-})
-
-// update a patient
-app.put('/patients/:id', async(req, res) => {
-    try {
-        const {id} = req.params;
-        const patient = await Patient.findByIdAndUpdate(id, req.body);
-        // no patient found
-        if(!patient){
-            return res.status(404).json({message: 'Patient with ID ${id} not found'})
+        const { id } = req.params;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: `User with ID ${id} not found` });
         }
-        const updatedPatient = await Patient.findById(id);
-        res.status(200).json(updatedPatient);
-
+        res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
-})
+});
 
-// delete a patient
-app.delete('/patients/:id', async(req, res) => {
+app.post('/users', async (req, res) => {
     try {
-        const {id} = req.params;
-        const patient = await Patient.findByIdAndDelete(id);
-        if(!id){
-            return res.status(404).json({message: 'Patient with ID ${id} not found'})
-        }
-        res.status(200).json(patient);
+        const user = await User.create(req.body);
+        res.status(201).json(user);
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
-})
+});
 
+app.put('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findByIdAndUpdate(id, req.body, { new: true });
+        if (!user) {
+            return res.status(404).json({ message: `User with ID ${id} not found` });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.delete('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).json({ message: `User with ID ${id} not found` });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 mongoose.connect('mongodb+srv://SejiLamina:20Jessie02mg%2E@sejilaminaapi.2c8i9.mongodb.net/?retryWrites=true&w=majority&appName=SejiLaminaAPI')
   .then(() => {
     console.log('MongoDB Connected...')
