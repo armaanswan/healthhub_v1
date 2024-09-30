@@ -1,10 +1,15 @@
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const User = require('./models/user')
 const app = express()
 
+const PORT = process.env.PORT || 3000
+const MONGO_URL = process.env.MONGO_URL
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
 // routes
 
 app.get('/', (req, res) => {
@@ -68,11 +73,11 @@ app.delete('/users/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-mongoose.connect('mongodb+srv://SejiLamina:20Jessie02mg%2E@sejilaminaapi.2c8i9.mongodb.net/?retryWrites=true&w=majority&appName=SejiLaminaAPI')
+mongoose.connect(MONGO_URL)
   .then(() => {
     console.log('MongoDB Connected...')
-    app.listen(3000, () => {
-        console.log('Server is running on port 3000')
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`)
     });
   })
   .catch((error) => {
