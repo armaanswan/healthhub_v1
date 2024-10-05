@@ -30,10 +30,12 @@ const userSchema = mongoose.Schema(
             required: [true, 'Last Name is required']
         },
         dateOfBirth: {
-            type: Date
+            type: Date,
+            // Optional: Add custom validation for age if necessary
         },
         contactNumber: {
-            type: String
+            type: String,
+            // Optional: Add regex match for specific formats
         },
         address: {
             street: String,
@@ -47,10 +49,12 @@ const userSchema = mongoose.Schema(
             default: false
         },
         specialization: {
-            type: String
+            type: String,
+            // Optional: required only for certain user types
         },
         licenseNumber: {
-            type: String
+            type: String,
+            // Optional: required only for certain user types
         }
     },
     {
