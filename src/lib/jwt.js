@@ -2,7 +2,12 @@ const { expressjwt } = require("express-jwt");
 const config = require("../config.js");
 const db = require("../lib/db");
 
-function jwt(roles = []) {
+function fromCookie(req) {
+  console.log(req.cookies.jwt);
+  return req.cookies.jwt;
+}
+
+function jwt(roles = [], credentialsRequired = true) {
   // roles param can be a single role string (e.g. Role.User or 'User')
   // or an array of roles (e.g. [Role.Admin, Role.User] or ['Admin', 'User'])
   if (typeof roles === "string") {
@@ -10,19 +15,27 @@ function jwt(roles = []) {
   }
   const secret = config.secret;
   return [
-    // authenticate JWT token and attach user to request object (req.user)
-    expressjwt({ secret, algorithms: ["HS256"] }),
+    // authenticate JWT token and attach user to request object (req.auth)
+    expressjwt({
+      secret,
+      algorithms: ["HS256"],
+      getToken: fromCookie,
+      credentialsRequired,
+    }),
 
     // authorize based on user role
     async (req, res, next) => {
-      const user = await db.User.findById(req.user.sub);
+      console.log(req.auth);
+      const user = await db.User.findById(req.auth.sub);
+      console.log(user);
+      console.log(!user, roles.length && !roles.includes(user.role));
 
       if (!user || (roles.length && !roles.includes(user.role))) {
         // user's role is not authorized
         return res.status(401).json({ message: "Only Admin is Authorized!" });
       }
       // authentication and authorization successful
-      req.user.role = user.role;
+      req.auth.role = user.role;
       next();
     },
   ];

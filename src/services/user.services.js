@@ -9,7 +9,6 @@ async function login({ email, password }) {
   //find the user using email
 
   const user = await User.findOne({ email });
-  console.log("user model", user);
   //if user is truthy then sign the token
   if (user && bcrypt.compareSync(password, user.password)) {
     const token = jwt.sign({ sub: user.id, role: user.role }, config.secret, {
@@ -18,13 +17,25 @@ async function login({ email, password }) {
     return { ...user.toJSON(), token };
   }
 }
+
 //retrieving all users
-async function getAll() {
-  return await User.find();
+async function getAllUsers(skip, limit, roleFilter) {
+  const findQuery = {};
+  if (roleFilter) findQuery.role = { $in: roleFilter };
+
+  const users = await User.find(findQuery)
+    .skip(skip) // Skip the first `skip` users
+    .limit(limit); // Limit the number of users returned to `limit`
+
+  const totalUsers = await User.countDocuments(); // Get the total number of users for pagination metadata
+
+  return {
+    data: users,
+    total: totalUsers,
+  };
 }
 //retrieving user using id
 async function getById(id) {
-  console.log("finding id: ", id);
   return await User.findById(id);
 }
 
@@ -42,12 +53,11 @@ async function createUser(userParam) {
   }
 
   await newUser.save();
+  return newUser;
 }
 
 async function updateUser(id, userParam) {
-  console.log(id, userParam);
   const user = await User.findById(id);
-  console.log(user.email, userParam.email);
   //validate the id and email
   if (!user) throw "User not found.";
   if (
@@ -65,15 +75,16 @@ async function updateUser(id, userParam) {
   //copy the user obj
   Object.assign(user, userParam);
   await user.save();
+  return user;
 }
 
 async function deleteUser(id) {
-  await User.findByIdAndRemove(id);
+  await User.findByIdAndDelete(id);
 }
 
 module.exports = {
   login,
-  getAll,
+  getAllUsers,
   getById,
   createUser,
   updateUser,

@@ -5,15 +5,15 @@ import { Form, Input, Select } from "antd";
 export const BlogPostEdit = () => {
   const { formProps, saveButtonProps, queryResult, formLoading } = useForm({});
 
-  const blogPostsData = queryResult?.data?.data;
+  // const blogPostsData = queryResult?.data?.data;
 
-  const { selectProps: categorySelectProps } = useSelect({
-    resource: "categories",
-    defaultValue: blogPostsData?.category,
-    queryOptions: {
-      enabled: !!blogPostsData?.category,
-    },
-  });
+  // const { selectProps: categorySelectProps } = useSelect({
+  //   resource: "categories",
+  //   defaultValue: blogPostsData?.category,
+  //   queryOptions: {
+  //     enabled: !!blogPostsData?.category,
+  //   },
+  // });
 
   return (
     <Edit saveButtonProps={saveButtonProps} isLoading={formLoading}>
@@ -40,7 +40,8 @@ export const BlogPostEdit = () => {
         >
           <MDEditor data-color-mode="light" />
         </Form.Item>
-        <Form.Item
+
+        {/* <Form.Item
           label={"Category"}
           name={["category", "id"]}
           initialValue={formProps?.initialValues?.category?.id}
@@ -51,7 +52,7 @@ export const BlogPostEdit = () => {
           ]}
         >
           <Select {...categorySelectProps} />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item
           label={"Status"}
           name={["status"]}

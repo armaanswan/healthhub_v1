@@ -6,6 +6,7 @@ import {
   ErrorComponent,
   ThemedLayoutV2,
   ThemedSiderV2,
+  ThemedTitleV2,
   useNotificationProvider,
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
@@ -16,27 +17,27 @@ import routerBindings, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router-v6";
-import dataProvider from "@refinedev/simple-rest";
 import { App as AntdApp } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
-import { authProvider } from "./authProvider";
+import { authProvider, USER_ROLE } from "./authProvider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
-import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "./pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "./pages/categories";
 import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
+import { UserCreate, UserEdit, UserList, UserShow } from "./pages/users";
+import dataProvider from "./dataProvider";
+import RegisterPatient from "./pages/register-patient";
+import { accessControlProvider } from "./accessControlProvider";
+import { PatientEdit, PatientList, PatientShow } from "./pages/patients";
+
+function NavigateToResourceByRole() {
+  const role = localStorage.getItem(USER_ROLE) || "";
+  if (role === "Doctor" || role === "Staff") {
+    return <NavigateToResource resource="patients" />;
+  }
+  return <NavigateToResource resource="users" />;
+}
 
 function App() {
   return (
@@ -46,30 +47,27 @@ function App() {
           <AntdApp>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
+                dataProvider={dataProvider}
+                accessControlProvider={accessControlProvider}
                 authProvider={authProvider}
                 resources={[
                   {
-                    name: "blog_posts",
-                    list: "/blog-posts",
-                    create: "/blog-posts/create",
-                    edit: "/blog-posts/edit/:id",
-                    show: "/blog-posts/show/:id",
+                    name: "users",
+                    list: "/users",
+                    create: "/users/create",
+                    edit: "/users/edit/:id",
+                    show: "/users/show/:id",
                     meta: {
                       canDelete: true,
                     },
                   },
                   {
-                    name: "categories",
-                    list: "/categories",
-                    create: "/categories/create",
-                    edit: "/categories/edit/:id",
-                    show: "/categories/show/:id",
-                    meta: {
-                      canDelete: true,
-                    },
+                    name: "patients",
+                    list: "/patients",
+                    edit: "/patients/edit/:id",
+                    show: "/patients/show/:id",
                   },
                 ]}
                 options={{
@@ -87,6 +85,13 @@ function App() {
                         fallback={<CatchAllNavigate to="/login" />}
                       >
                         <ThemedLayoutV2
+                          Title={() => (
+                            <ThemedTitleV2
+                              text="HealthHub"
+                              // icon={<img src="https://refine.dev/img/logo.png" />}
+                              collapsed={false}
+                            />
+                          )}
                           Header={Header}
                           Sider={(props) => <ThemedSiderV2 {...props} fixed />}
                         >
@@ -95,11 +100,20 @@ function App() {
                       </Authenticated>
                     }
                   >
-                    <Route
-                      index
-                      element={<NavigateToResource resource="blog_posts" />}
-                    />
-                    <Route path="/blog-posts">
+                    <Route index element={<NavigateToResourceByRole />} />
+
+                    <Route path="/users">
+                      <Route index element={<UserList />} />
+                      <Route path="create" element={<UserCreate />} />
+                      <Route path="edit/:id" element={<UserEdit />} />
+                      <Route path="show/:id" element={<UserShow />} />
+                    </Route>
+                    <Route path="/patients">
+                      <Route index element={<PatientList />} />
+                      <Route path="edit/:id" element={<PatientEdit />} />
+                      <Route path="show/:id" element={<PatientShow />} />
+                    </Route>
+                    {/* <Route path="/blog-posts">
                       <Route index element={<BlogPostList />} />
                       <Route path="create" element={<BlogPostCreate />} />
                       <Route path="edit/:id" element={<BlogPostEdit />} />
@@ -110,7 +124,7 @@ function App() {
                       <Route path="create" element={<CategoryCreate />} />
                       <Route path="edit/:id" element={<CategoryEdit />} />
                       <Route path="show/:id" element={<CategoryShow />} />
-                    </Route>
+                    </Route> */}
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
                   <Route
@@ -128,6 +142,10 @@ function App() {
                     <Route
                       path="/forgot-password"
                       element={<ForgotPassword />}
+                    />
+                    <Route
+                      path="/register-patient"
+                      element={<RegisterPatient />}
                     />
                   </Route>
                 </Routes>
