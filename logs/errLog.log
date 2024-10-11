@@ -1,0 +1,13 @@
+2024-10-10	11:13:27	563e9b72-9614-4ee6-9c83-c8cae5a7627b	Error: Not allowed by CORS	OPTIONS	/	https://www.google.com
+2024-10-10	11:13:27	501fd8a2-95c3-40eb-9efc-0a2f830b166f	Error: Not allowed by CORS	GET	/	https://www.google.com
+2024-10-10	14:42:50	405784f0-87d0-4004-9f88-d64e421d767f	ReferenceError: Users is not defined	GET	/users	undefined
+2024-10-10	14:44:24	93f7fcf9-e2df-4f63-b318-0086f7decc78	ReferenceError: Users is not defined	GET	/users	undefined
+2024-10-10	14:44:39	f7b1670b-8cfd-4480-8745-b932805d1c38	ReferenceError: Users is not defined	GET	/users	undefined
+2024-10-10	14:46:01	5de0d20c-ff0c-4cbd-a2f2-89a4968bcaea	ReferenceError: Users is not defined	GET	/users	undefined
+2024-10-10	14:47:13	b2af27f3-5394-41af-85b7-0d6e14c02064	ReferenceError: Users is not defined	GET	/users	undefined
+2024-10-10	14:53:43	8afe2b62-a172-46d6-85ef-18daf1c37309	SyntaxError: Expected double-quoted property name in JSON at position 54	POST	/users	undefined
+2024-10-10	14:53:53	446c2a55-033d-4517-b13d-a634fffe25e3	SyntaxError: Expected double-quoted property name in JSON at position 54	POST	/users	undefined
+2024-10-10	14:57:45	87b604c2-47cd-4335-81ab-720f65615be5	CastError: Cast to ObjectId failed for value "67084c589ec39a8bf9a3a50" (type string) at path "_id" for model "User"	PATCH	/users	undefined
+2024-10-10	15:01:18	ba559bb5-95c4-4272-9dd1-235029fca18a	CastError: Cast to ObjectId failed for value "67084c589ec39a8bf9a3a50" (type string) at path "_id" for model "User"	PATCH	/users	undefined
+2024-10-10	15:06:21	e5560db6-19e0-4aa7-9e43-3d1ff5886e36	CastError: Cast to ObjectId failed for value "67084c589ec39a8bf9a3a50" (type string) at path "_id" for model "User"	PATCH	/users	undefined
+2024-10-10	15:06:38	0e6c3321-c3b6-4343-9f2d-93cce968d405	CastError: Cast to ObjectId failed for value "67084c589ec39a8bf9a3a50" (type string) at path "_id" for model "User"	PATCH	/users	undefined
