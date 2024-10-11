@@ -1,5 +1,5 @@
 const allowedOrigins = [
-    'http://localhost:300',
+    'http://localhost:3500',
     'https://www.healthhub.com',
     'https://healthhub.com'
 
