@@ -1,80 +1,53 @@
-const express = require('express')
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const path = require('path');
+const { logger, logEvents } = require('./middleware/logger');
+const errorHandler = require('./middleware/errorHandler');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const corsOptions = require('./config/corsOptions')
+const connectDB = require('./config/dbConn')
 const mongoose = require('mongoose')
-const User = require('./models/usersModel')
-const app = express()
+const PORT = process.env.PORT || 3500;
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
-// routes
+console.log(process.env.NODE_ENV)
 
-app.get('/', (req, res) => {
-    res.send('Hello Node API')
+connectDB()
+
+app.use(logger)
+
+app.use(cors(corsOptions));
+
+app.use(express.json());
+
+app.use(cookieParser());
+
+app.use('/', express.static(path.join(__dirname, 'public')));
+
+app.use('/', require('./routes/root'));
+app.use('/users', require('./routes/userRoutes')); 
+
+app.all('*', (req, res) => {
+    res.status(404)
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'views', '404.html'));
+    } else if (req.accepts('json')) {
+        res.json({ message: '404 Not found' });
+    }else {
+        res.type('txt').send('404 Not found');
+    }
 })
 
-// Users routes
-app.get('/users', async (req, res) => {
-    try {
-        const users = await User.find();
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+app.use(errorHandler);
+
+mongoose.connection.once('open', () => {
+    console.log('MongoDB connected');
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
 
-app.get('/users/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: `User with ID ${id} not found` });
-        }
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
+mongoose.connection.on('error', err => {
+    console.log(`MongoDB connection error: ${err}`);
+    logEvents(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`, 'mongoErrLog.log');
+})
 
-app.post('/users', async (req, res) => {
-    try {
-        const user = await User.create(req.body);
-        res.status(201).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-app.put('/users/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findByIdAndUpdate(id, req.body, { new: true });
-        if (!user) {
-            return res.status(404).json({ message: `User with ID ${id} not found` });
-        }
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-app.delete('/users/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findByIdAndDelete(id);
-        if (!user) {
-            return res.status(404).json({ message: `User with ID ${id} not found` });
-        }
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-mongoose.connect('mongodb+srv://SejiLamina:20Jessie02mg%2E@sejilaminaapi.2c8i9.mongodb.net/?retryWrites=true&w=majority&appName=SejiLaminaAPI')
-  .then(() => {
-    console.log('MongoDB Connected...')
-    app.listen(3000, () => {
-        console.log('Server is running on port 3000')
-    });
-  })
-  .catch((error) => {
-    console.log(error);
-  });
