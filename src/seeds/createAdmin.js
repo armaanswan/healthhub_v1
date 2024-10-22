@@ -6,6 +6,8 @@ const createAdmin = async () => {
     email: "admin@email.com",
     firstName: "Admin",
     lastName: "User",
+    phoneNumber: "1234567890",
+    dateOfBirth: new Date(),
     password: "admin",
     isActive: true,
     role: role.Admin,

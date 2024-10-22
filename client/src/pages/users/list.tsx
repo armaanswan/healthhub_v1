@@ -26,6 +26,11 @@ export const UserList = () => {
         <Table.Column dataIndex="email" title="Email" />
 
         <Table.Column dataIndex="role" title="Role" />
+        <Table.Column
+          dataIndex="isActive"
+          title="Account Status"
+          render={(value) => (value ? "Active" : "Inactive")}
+        />
         {/* <Table.Column
           dataIndex="content"
           title={"Content"}

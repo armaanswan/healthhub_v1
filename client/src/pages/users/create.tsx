@@ -1,5 +1,5 @@
 import { Create, useForm } from "@refinedev/antd";
-import { Col, Form, Input, Row, Select } from "antd";
+import { Col, DatePicker, Form, Input, Row, Select } from "antd";
 
 export const UserCreate = () => {
   const { formProps, saveButtonProps } = useForm({});
@@ -51,6 +51,28 @@ export const UserCreate = () => {
           ]}
         >
           <Input type="password" />
+        </Form.Item>
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Date of Birth"
+          name="dateOfBirth"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <DatePicker />
         </Form.Item>
         <Row gutter={16}>
           <Col span={8}>

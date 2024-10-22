@@ -1,8 +1,18 @@
 import { Edit, ListButton, RefreshButton, useForm } from "@refinedev/antd";
-import { Button, Col, Form, Input, Row, Select, Switch } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Row,
+  Select,
+  Switch,
+} from "antd";
 import { User } from "../../lib/api/schemas";
 import { useGetIdentity } from "@refinedev/core";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 export const UserEdit = () => {
   const navigate = useNavigate();
@@ -13,6 +23,7 @@ export const UserEdit = () => {
       if (user?.id !== query?.data?.data.id) navigate("/users");
     },
   });
+  console.log("props", formProps);
   const isSameUser = user?.id === query?.data?.data.id;
 
   return (
@@ -32,7 +43,7 @@ export const UserEdit = () => {
       <Form {...formProps} layout="vertical">
         <Form.Item
           label="First Name"
-          name={["firstName"]}
+          name="firstName"
           rules={[
             {
               required: true,
@@ -53,7 +64,7 @@ export const UserEdit = () => {
           <Input />
         </Form.Item>
         <Form.Item
-          label={"Email"}
+          label="Email"
           name="email"
           rules={[
             {
@@ -62,6 +73,31 @@ export const UserEdit = () => {
           ]}
         >
           <Input />
+        </Form.Item>
+        <Form.Item
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Date of Birth"
+          name="dateOfBirth"
+          getValueProps={(value) => ({
+            value: value ? dayjs(value) : "",
+          })}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <DatePicker />
         </Form.Item>
         {!isSameUser && (
           <Row gutter={16}>
