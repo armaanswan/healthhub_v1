@@ -10,7 +10,7 @@ usersRouter.post("/login", login);
 usersRouter.post("/register", register);
 usersRouter.post("/logout", logout);
 usersRouter.post("/", jwt([Role.Admin]), createUser);
-usersRouter.get("/", jwt([Role.Admin]), getAllUsers);
+usersRouter.get("/", jwt([Role.Admin, Role.Staff]), getAllUsers);
 patientsRouter.get("/", jwt([Role.Doctor, Role.Staff]), getAllUsers);
 usersRouter.get("/current", jwt(), getCurrentUser);
 usersRouter.get("/:id", jwt(), getUserById);
@@ -33,7 +33,7 @@ function login(req, res, next) {
           .json({ message: "Username or password is incorrect." });
       if (!user.isActive && user.role === Role.Patient) {
         return res.status(400).json({
-          message: "Your account is not active. Please contact stuff.",
+          message: "Your account is not active. Please contact staff.",
         });
       }
 
@@ -89,22 +89,28 @@ function getAllUsers(req, res, next) {
   if (currentUser.role === Role.Patient) {
     return res.status(401).json({ message: "Not Authorized!" });
   }
+  const queryFilters = {};
   if (currentUser.role === Role.Doctor || currentUser.role === Role.Staff) {
-    roleFilter = [Role.Patient];
+    // roleFilter = [Role.Patient];
+    queryFilters.role = Role.Patient;
   }
+  const { _page: rawPage, _limit: rawLimit, ...filters } = req.query;
 
-  const page = parseInt(req.query._page) || 1; // Default to page 1
-  const limit = parseInt(req.query._limit) || 10; // Default to 10 users per page
+  const page = parseInt(rawPage) || 1; // Default to page 1
+  const limit = parseInt(rawLimit) || 10; // Default to 10 users per page
   const skip = (page - 1) * limit;
 
+  for (const [key, value] of Object.entries(filters)) {
+    queryFilters[key] = value;
+  }
+
   userServices
-    .getAllUsers(skip, limit, roleFilter)
+    .getAllUsers(skip, limit, queryFilters)
     .then((users) => res.json(users))
     .catch((err) => next(err));
 }
 
 function getCurrentUser(req, res, next) {
-  console.log(req);
   userServices
     .getById(req.auth.sub)
     .then((user) => (user ? res.json(user) : res.status(404)))

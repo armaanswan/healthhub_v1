@@ -13,6 +13,10 @@ const schema = new Schema({
   createdDate: { type: Date, default: Date.now },
 });
 
+schema.virtual("fullName").get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
+
 schema.set("toJSON", {
   virtuals: true,
   versionKey: false,

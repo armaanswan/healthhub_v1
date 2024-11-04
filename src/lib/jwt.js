@@ -3,7 +3,6 @@ const config = require("../config.js");
 const db = require("../lib/db");
 
 function fromCookie(req) {
-  console.log(req.cookies.jwt);
   return req.cookies.jwt;
 }
 
@@ -25,10 +24,7 @@ function jwt(roles = [], credentialsRequired = true) {
 
     // authorize based on user role
     async (req, res, next) => {
-      console.log(req.auth);
       const user = await db.User.findById(req.auth.sub);
-      console.log(user);
-      console.log(!user, roles.length && !roles.includes(user.role));
 
       if (!user || (roles.length && !roles.includes(user.role))) {
         // user's role is not authorized

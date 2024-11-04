@@ -30,11 +30,17 @@ import dataProvider from "./dataProvider";
 import RegisterPatient from "./pages/register-patient";
 import { accessControlProvider } from "./accessControlProvider";
 import { PatientEdit, PatientList, PatientShow } from "./pages/patients";
+import { TestResultList } from "./pages/test-results/list";
+import { TestResultCreate } from "./pages/test-results/create";
+import { TestResultEdit } from "./pages/test-results/edit";
+import { TestResultShow } from "./pages/test-results/show";
 
 function NavigateToResourceByRole() {
   const role = localStorage.getItem(USER_ROLE) || "";
   if (role === "Doctor" || role === "Staff") {
     return <NavigateToResource resource="patients" />;
+  } else if (role === "Patient") {
+    return <NavigateToResource resource="test-results" />;
   }
   return <NavigateToResource resource="users" />;
 }
@@ -68,6 +74,13 @@ function App() {
                     list: "/patients",
                     edit: "/patients/edit/:id",
                     show: "/patients/show/:id",
+                  },
+                  {
+                    name: "test-results",
+                    list: "/test-results",
+                    create: "/test-results/create",
+                    edit: "/test-results/edit/:id",
+                    show: "/test-results/show/:id",
                   },
                 ]}
                 options={{
@@ -112,6 +125,12 @@ function App() {
                       <Route index element={<PatientList />} />
                       <Route path="edit/:id" element={<PatientEdit />} />
                       <Route path="show/:id" element={<PatientShow />} />
+                    </Route>
+                    <Route path="/test-results">
+                      <Route index element={<TestResultList />} />
+                      <Route path="create" element={<TestResultCreate />} />
+                      <Route path="edit/:id" element={<TestResultEdit />} />
+                      <Route path="show/:id" element={<TestResultShow />} />
                     </Route>
                     {/* <Route path="/blog-posts">
                       <Route index element={<BlogPostList />} />

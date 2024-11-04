@@ -19,9 +19,8 @@ async function login({ email, password }) {
 }
 
 //retrieving all users
-async function getAllUsers(skip, limit, roleFilter) {
-  const findQuery = {};
-  if (roleFilter) findQuery.role = { $in: roleFilter };
+async function getAllUsers(skip, limit, queryFilters) {
+  const findQuery = queryFilters;
 
   const users = await User.find(findQuery)
     .skip(skip) // Skip the first `skip` users

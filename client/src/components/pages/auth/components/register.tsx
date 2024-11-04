@@ -31,6 +31,7 @@ import {
   type FormProps,
   Divider,
   theme,
+  DatePicker,
 } from "antd";
 
 type RegisterProps = RegisterPageProps<LayoutProps, CardProps, FormProps>;
@@ -154,7 +155,6 @@ export const RegisterPage: React.FC<RegisterProps> = ({
           layout="vertical"
           form={form}
           onFinish={(values) => {
-            console.log("values", values);
             register(values);
           }}
           requiredMark={false}
@@ -206,6 +206,28 @@ export const RegisterPage: React.FC<RegisterProps> = ({
               size="large"
               placeholder={translate("pages.register.fields.email", "Email")}
             />
+          </Form.Item>
+          <Form.Item
+            name="phoneNumber"
+            label={"Phone Number"}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input size="large" />
+          </Form.Item>
+          <Form.Item
+            label="Date of Birth"
+            name="dateOfBirth"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <DatePicker />
           </Form.Item>
           <Form.Item
             name="password"

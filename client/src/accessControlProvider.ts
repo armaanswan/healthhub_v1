@@ -4,10 +4,21 @@ import { AccessControl } from "accesscontrol";
 
 const ac = new AccessControl();
 
-ac.grant("Admin").create("users").read("users").update("users").delete("users");
-ac.grant("Doctor").read("patients").update("patients");
-ac.grant("Staff").extend("Doctor");
-
+ac.grant("Admin")
+  .create("users")
+  .read("users")
+  .update("users")
+  .delete("users")
+  .create("test-results")
+  .read("test-results")
+  .update("test-results")
+  .delete("test-results");
+ac.grant("Doctor").read("patients").update("patients").read("test-results");
+ac.grant("Staff")
+  .extend("Doctor")
+  .create("test-results")
+  .update("test-results");
+ac.grant("Patient").read("test-results");
 export const accessControlProvider: AccessControlProvider = {
   can: async ({ resource, action, params }: CanParams) => {
     let permission;
@@ -26,9 +37,9 @@ export const accessControlProvider: AccessControlProvider = {
     } else if (action === "delete") {
       permission = ac.can(role).resource(resource).deleteAny();
     }
-    console.log("can", resource, action, params);
-    console.log("permission", permission, permission?.granted);
-    console.log("role", role);
+    // console.log("can", resource, action, params);
+    // console.log("permission", permission, permission?.granted);
+    // console.log("role", role);
 
     return {
       can: permission?.granted || false,

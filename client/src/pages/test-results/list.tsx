@@ -7,12 +7,28 @@ import {
   ShowButton,
   useTable,
 } from "@refinedev/antd";
-import { type BaseRecord, useMany } from "@refinedev/core";
+import { type BaseRecord, useGetIdentity, useMany } from "@refinedev/core";
 import { Space, Table } from "antd";
+import { USER_ROLE } from "../../authProvider";
+import { User } from "../../lib/api/schemas";
 
 export const TestResultList = () => {
+  const { data: user } = useGetIdentity<User>();
+
   const { tableProps } = useTable({
     syncWithLocation: true,
+    filters: {
+      permanent:
+        user?.role === "Patient"
+          ? [
+              {
+                field: "patientId",
+                operator: "eq",
+                value: user?.id,
+              },
+            ]
+          : [],
+    },
   });
 
   // const { data: categoryData, isLoading: categoryIsLoading } = useMany({
@@ -29,8 +45,26 @@ export const TestResultList = () => {
   return (
     <List>
       <Table {...tableProps} rowKey="id">
-        <Table.Column dataIndex="id" title={"ID"} />
-        <Table.Column dataIndex="title" title={"Title"} />
+        {/* <Table.Column dataIndex="id" title={"ID"} /> */}
+        <Table.Column dataIndex={["patientId", "fullName"]} title={"Patient"} />
+        <Table.Column dataIndex={["doctorId", "fullName"]} title={"Doctor"} />
+        <Table.Column dataIndex="examType" title={"Exam Type"} />
+        <Table.Column dataIndex="result" title={"Exam Result"} />
+        <Table.Column
+          dataIndex="isAbnormal"
+          title={"Conclusion"}
+          render={(value) => {
+            if (value === undefined) return "-";
+            return value ? "Abnormal" : "Normal";
+          }}
+        />
+        <Table.Column
+          dataIndex="isReady"
+          title={"Status"}
+          render={(value) => {
+            return value ? "Ready" : "Prescribed";
+          }}
+        />
         {/* <Table.Column
           dataIndex="content"
           title={"Content"}

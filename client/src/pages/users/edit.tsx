@@ -23,7 +23,6 @@ export const UserEdit = () => {
       if (user?.id !== query?.data?.data.id) navigate("/users");
     },
   });
-  console.log("props", formProps);
   const isSameUser = user?.id === query?.data?.data.id;
 
   return (

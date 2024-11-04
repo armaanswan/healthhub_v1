@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-  patientId: { type: String, required: true },
-  doctorId: { type: String, required: true },
-  examDate: { type: Date, required: true },
+  patientId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   examType: { type: String, required: true },
-  result: { type: Number, required: true },
-  isAbnormal: { type: Boolean, required: true },
+  result: { type: Number },
+  isAbnormal: { type: Boolean },
+  isReady: { type: Boolean },
   createdDate: { type: Date, default: Date.now },
 });
 

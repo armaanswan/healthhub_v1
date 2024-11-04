@@ -5,15 +5,27 @@ const Role = require("../lib/role");
 const testResultServices = require("../services/testResult.services");
 
 // Routes
-testResultsRouter.post("/", jwt([Role.Doctor]), createTestResult);
-testResultsRouter.get("/", jwt([Role.Doctor, Role.Staff]), getAllTestResults);
+testResultsRouter.post(
+  "/",
+  jwt([Role.Staff, Role.Admin, Role.Doctor]),
+  createTestResult
+);
+testResultsRouter.get("/", jwt(), getAllTestResults);
 testResultsRouter.get(
   "/:id",
   jwt([Role.Doctor, Role.Staff, Role.Patient]),
   getTestResultById
 );
-testResultsRouter.put("/:id", jwt([Role.Doctor]), updateTestResult);
-testResultsRouter.delete("/:id", jwt([Role.Doctor]), deleteTestResult);
+testResultsRouter.put(
+  "/:id",
+  jwt([Role.Doctor, Role.Staff, Role.Admin]),
+  updateTestResult
+);
+testResultsRouter.delete(
+  "/:id",
+  jwt([Role.Doctor, Role.Admin]),
+  deleteTestResult
+);
 
 module.exports = { testResultsRouter };
 
@@ -31,12 +43,20 @@ function createTestResult(req, res, next) {
 }
 
 function getAllTestResults(req, res, next) {
-  const page = parseInt(req.query._page) || 1; // Default to page 1
-  const limit = parseInt(req.query._limit) || 10; // Default to 10 results per page
+  const { _page: rawPage, _limit: rawLimit, ...filters } = req.query;
+
+  const page = parseInt(rawPage) || 1; // Default to page 1
+  const limit = parseInt(rawLimit) || 10; // Default to 10 users per page
   const skip = (page - 1) * limit;
 
+  const queryFilters = {};
+
+  for (const [key, value] of Object.entries(filters)) {
+    queryFilters[key] = value;
+  }
+
   testResultServices
-    .getAllTestResults(skip, limit)
+    .getAllTestResults(skip, limit, queryFilters)
     .then((testResults) => res.json(testResults))
     .catch((err) => next(err));
 }

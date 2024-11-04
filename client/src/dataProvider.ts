@@ -9,13 +9,20 @@ const apiClient = axios.create({
 
 const dataProvider: DataProvider = {
   // required methods
-  getList: async ({ resource, pagination }) => {
+  getList: async ({ resource, pagination, filters }) => {
     try {
       const { current, pageSize } = pagination ?? {};
 
+      const filterParams = filters?.reduce((acc, filter) => {
+        if (filter.operator === "eq") {
+          acc[filter.field] = filter.value;
+        }
+        return acc;
+      }, {} as any);
+
       // Adjust request parameters to meet the requirements of your API
       const response = await apiClient.get(`/${resource}`, {
-        params: { _page: current, _limit: pageSize },
+        params: { _page: current, _limit: pageSize, ...filterParams },
       });
 
       // The total row count could be sourced differently based on the provider
