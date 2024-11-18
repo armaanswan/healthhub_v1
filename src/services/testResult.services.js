@@ -1,5 +1,6 @@
 const db = require("../lib/db");
 const TestResult = db.TestResult;
+const MonitoringSettings = db.MonitoringSettings;
 
 function defineAbnormality(type, result) {
   switch (type) {
@@ -25,9 +26,7 @@ function defineAbnormality(type, result) {
   return false;
 }
 
-// Adding a new test result to the db
 async function createTestResult(testResultParam) {
-  console.log(testResultParam);
   const newTestResult = new TestResult({
     ...testResultParam,
     isAbnormal: testResultParam?.result
@@ -35,33 +34,52 @@ async function createTestResult(testResultParam) {
       : undefined,
     isReady: Boolean(testResultParam?.result),
   });
+  
+  if (testResult.isAbnormal && testResultParam.patientId) {
+    const monitoring = await MonitoringSettings.find({
+      patientId: testResultParam.patientId,
+      monitoredFunction: testResultParam.examType,
+    });
+
+    if (monitoring.length > 0) {
+      monitoring.forEach(monitoring => {
+        console.log('ABNORMAL TEST RESULT ALERT (UPDATE):', {
+          testResult: testResult._id,
+          patient: testResultParam.patientId,
+          doctor: monitoring.doctorId,
+          monitoredFunction: testResultParam.examType,
+          result: testResultParam.result,
+          timestamp: new Date().toISOString()
+        });
+      });
+    }
+  }
+  
   await newTestResult.save();
   return newTestResult;
 }
 
-// Retrieving all test results
 async function getAllTestResults(skip, limit, queryFilters) {
   const testResults = await TestResult.find(queryFilters)
     .populate("patientId")
     .populate("doctorId")
     .skip(skip)
     .limit(limit);
-  const totalTestResults = await TestResult.countDocuments(); // Get the total number of test results for pagination metadata
+  const totalTestResults = await TestResult.countDocuments();
   return {
     data: testResults,
     total: totalTestResults,
   };
 }
 
-// Retrieving a test result by id
 async function getById(id) {
   return await TestResult.findById(id);
 }
 
-// Updating a test result
 async function updateTestResult(id, testResultParam) {
   const testResult = await TestResult.findById(id);
   if (!testResult) throw "Test result not found.";
+  
   Object.assign(testResult, {
     ...testResultParam,
     isAbnormal: testResultParam.result
@@ -69,11 +87,33 @@ async function updateTestResult(id, testResultParam) {
       : undefined,
     isReady: Boolean(testResultParam?.result),
   });
+
+  console.log('TEST RESULT:', testResult.isAbnormal, testResultParam.patientId, testResultParam.examType);
+
+  if (testResult.isAbnormal && testResultParam.patientId) {
+    const monitoring = await MonitoringSettings.find({
+      patientId: testResultParam.patientId,
+      monitoredFunction: testResultParam.examType,
+    }).populate('doctorId');
+
+    if (monitoring.length > 0) {
+      monitoring.forEach(monitoring => {
+        console.log('ABNORMAL TEST RESULT ALERT (UPDATE):', {
+          testResult: testResult._id,
+          patient: testResultParam.patientId,
+          doctor: monitoring.doctorId,
+          monitoredFunction: testResultParam.examType,
+          result: testResultParam.result,
+          timestamp: new Date().toISOString()
+        });
+      });
+    }
+  }
+
   await testResult.save();
   return testResult;
 }
 
-// Deleting a test result
 async function deleteTestResult(id) {
   await TestResult.findByIdAndDelete(id);
 }
