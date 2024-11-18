@@ -1,7 +1,8 @@
-import { Show, TextField } from "@refinedev/antd";
+import { Show, TextField, useModal } from "@refinedev/antd";
 import { useShow } from "@refinedev/core";
-import { Typography } from "antd";
+import { Button, Modal, Select, Typography } from "antd";
 import dayjs from "dayjs";
+import { USER_ROLE } from "../../authProvider";
 
 const { Title } = Typography;
 
@@ -9,10 +10,29 @@ export const UserShow = () => {
   const { query } = useShow({});
   const { data, isLoading } = query;
 
+  const role = localStorage.getItem(USER_ROLE) || "";
+
   const record = data?.data;
 
+  const { show, modalProps } = useModal();
+
   return (
-    <Show isLoading={isLoading}>
+    <>
+    
+    <Show isLoading={isLoading}
+    
+    headerButtons={({ defaultButtons }) => (
+      <>
+        {defaultButtons}
+        
+        {role === "Admin" && (
+          <Button type="primary" onClick={() => show()}>
+            Generate Report
+          </Button>
+        )}
+      </>
+    )}
+    >
       <Title level={5}>{"ID"}</Title>
       <TextField value={record?.id} />
       <Title level={5}>{"First Name"}</Title>
@@ -28,5 +48,9 @@ export const UserShow = () => {
       <Title level={5}>{"Role"}</Title>
       <TextField value={record?.role} />
     </Show>
+      <Modal {...modalProps}>
+        
+      </Modal>
+    </>
   );
 };
