@@ -6,7 +6,7 @@ const schema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   phoneNumber: { type: String, required: true },
-  healthId: { type: String, required: true },
+  healthId: { type: String },
   dateOfBirth: { type: Date, required: true },
   password: { type: String, required: true },
   isActive: { type: Boolean, default: false },

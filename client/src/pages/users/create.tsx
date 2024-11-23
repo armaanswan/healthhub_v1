@@ -64,6 +64,17 @@ export const UserCreate = () => {
           <Input />
         </Form.Item>
         <Form.Item
+          label="Work ID"
+          name="healthId"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
           label="Date of Birth"
           name="dateOfBirth"
           rules={[
