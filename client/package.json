@@ -39,7 +39,8 @@
     "dev": "refine dev",
     "build": "tsc && refine build",
     "start": "refine start",
-    "refine": "refine"
+    "refine": "refine",
+    "node": "src/seeds/createAdmin.js"
   },
   "browserslist": {
     "production": [
