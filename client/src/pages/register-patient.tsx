@@ -70,8 +70,7 @@ export default function RegisterPatient() {
             }}
           >
             <Typography.Text strong>
-              Please, wait for our stuff to confirm your registration and
-              activate the account.
+              Please wait for an administrator to review and approve your registration. Your account will be activated once the approval process is complete.
             </Typography.Text>
             <br /> <br />
             <Typography.Text strong>
