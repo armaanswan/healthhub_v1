@@ -208,6 +208,17 @@ export const RegisterPage: React.FC<RegisterProps> = ({
             />
           </Form.Item>
           <Form.Item
+            name="healthId"
+            label={"Health ID"}
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input size="large" />
+          </Form.Item>
+          <Form.Item
             name="phoneNumber"
             label={"Phone Number"}
             rules={[

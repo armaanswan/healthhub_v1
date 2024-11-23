@@ -3,26 +3,45 @@ import axios, { AxiosError } from "axios";
 
 const apiUrl = "/api";
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: apiUrl,
 });
 
 const dataProvider: DataProvider = {
   // required methods
-  getList: async ({ resource, pagination, filters }) => {
+  getList: async ({ resource, pagination, filters, sorters }) => {
     try {
       const { current, pageSize } = pagination ?? {};
 
+      // Convert filters to API parameters
       const filterParams = filters?.reduce((acc, filter) => {
-        if (filter.operator === "eq") {
-          acc[filter.field] = filter.value;
+        switch (filter.operator) {
+          case "eq":
+            acc[filter.field] = filter.value;
+            break;
+          case "contains":
+            acc[`${filter.field}_like`] = filter.value;
+            break;
+          // Add more operators as needed
         }
         return acc;
       }, {} as any);
 
-      // Adjust request parameters to meet the requirements of your API
+      // Convert sorters to API parameters
+      const sortParams = sorters?.reduce((acc, sorter) => {
+        acc._sort = sorter.field;
+        acc._order = sorter.order.toLowerCase(); // 'asc' or 'desc'
+        return acc;
+      }, {} as any);
+
+      // Combine all parameters
       const response = await apiClient.get(`/${resource}`, {
-        params: { _page: current, _limit: pageSize, ...filterParams },
+        params: {
+          _page: current,
+          _limit: pageSize,
+          ...filterParams,
+          ...sortParams,
+        },
       });
 
       // The total row count could be sourced differently based on the provider

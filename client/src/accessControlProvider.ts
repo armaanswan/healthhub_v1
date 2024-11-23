@@ -15,7 +15,8 @@ ac.grant("Admin")
   .delete("test-results");
 ac.grant("Doctor").read("patients").update("patients").read("test-results");
 ac.grant("Staff")
-  .extend("Doctor")
+  .read("patients")
+  .read("test-results")
   .create("test-results")
   .update("test-results");
 ac.grant("Patient").read("test-results");

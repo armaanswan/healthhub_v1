@@ -108,6 +108,12 @@ export const PatientShow = () => {
         <TextField value={record?.email} />
         <Title level={5}>{"Phone Number"}</Title>
         <TextField value={record?.phoneNumber} />
+        {record?.role === "Patient" && (
+          <>
+            <Title level={5}>{"Health ID"}</Title>
+            <TextField value={record?.healthId} />
+          </>
+        )}
         <Title level={5}>{"Date of Birth"}</Title>
         <TextField value={dayjs(record?.dateOfBirth).format("DD/MM/YYYY")} />
 

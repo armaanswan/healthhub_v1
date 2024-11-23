@@ -24,6 +24,7 @@ export const UserEdit = () => {
     },
   });
   const isSameUser = user?.id === query?.data?.data.id;
+  const isPatient = query?.data?.data.role === "Patient";
 
   return (
     <Edit
@@ -84,6 +85,14 @@ export const UserEdit = () => {
         >
           <Input />
         </Form.Item>
+        {isPatient && (
+          <Form.Item
+            label="Health ID"
+            name="healthId"
+          >
+            <Input />
+          </Form.Item>
+        )}
         <Form.Item
           label="Date of Birth"
           name="dateOfBirth"

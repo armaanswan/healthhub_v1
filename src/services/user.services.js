@@ -19,14 +19,25 @@ async function login({ email, password }) {
 }
 
 //retrieving all users
-async function getAllUsers(skip, limit, queryFilters) {
-  const findQuery = queryFilters;
+async function getAllUsers(skip, limit, queryFilters, querySorters) {
+  const [sort, order] = querySorters;
+  const findQuery = Object.entries(queryFilters).reduce((acc, [key, value]) => {
+    if (typeof value === 'string') {
+      acc[key] = { $regex: value, $options: 'i' };
+    } else {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+  
+  const sortObj = sort ? { [sort]: order === "desc" ? -1 : 1 } : {};
 
   const users = await User.find(findQuery)
+    .sort(sortObj)
     .skip(skip) // Skip the first `skip` users
     .limit(limit); // Limit the number of users returned to `limit`
 
-  const totalUsers = await User.countDocuments(); // Get the total number of users for pagination metadata
+  const totalUsers = await User.countDocuments(findQuery); // Get the total number of users for pagination metadata
 
   return {
     data: users,

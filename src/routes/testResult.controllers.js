@@ -13,7 +13,7 @@ testResultsRouter.post(
 testResultsRouter.get("/", jwt(), getAllTestResults);
 testResultsRouter.get(
   "/:id",
-  jwt([Role.Doctor, Role.Staff, Role.Patient]),
+  jwt([Role.Doctor, Role.Staff, Role.Patient, Role.Admin]),
   getTestResultById
 );
 testResultsRouter.put(
@@ -26,11 +26,22 @@ testResultsRouter.delete(
   jwt([Role.Doctor, Role.Admin]),
   deleteTestResult
 );
+testResultsRouter.get(
+  "/report/:patientId/month/:month",
+  jwt([Role.Admin]),
+  generateMonthlyReport
+);
+testResultsRouter.get(
+  "/report/:patientId/year/:year",
+  jwt([Role.Admin]),
+  generateYearlyReport
+);
 
 module.exports = { testResultsRouter };
 
 // Route functions
 function createTestResult(req, res, next) {
+  console.log('REQ BODY:', req.body);
   testResultServices
     .createTestResult(req.body)
     .then((data) =>
@@ -43,20 +54,19 @@ function createTestResult(req, res, next) {
 }
 
 function getAllTestResults(req, res, next) {
-  const { _page: rawPage, _limit: rawLimit, ...filters } = req.query;
+  const { _page: rawPage, _limit: rawLimit, _sort, _order, ...filters } = req.query;
 
   const page = parseInt(rawPage) || 1; // Default to page 1
-  const limit = parseInt(rawLimit) || 10; // Default to 10 users per page
+  const limit = parseInt(rawLimit) || 10; // Default to 10 results per page
   const skip = (page - 1) * limit;
 
   const queryFilters = {};
-
   for (const [key, value] of Object.entries(filters)) {
     queryFilters[key] = value;
   }
 
   testResultServices
-    .getAllTestResults(skip, limit, queryFilters)
+    .getAllTestResults(skip, limit, queryFilters, [_sort, _order])
     .then((testResults) => res.json(testResults))
     .catch((err) => next(err));
 }
@@ -94,5 +104,23 @@ function deleteTestResult(req, res, next) {
         message: `Test result with id: ${req.params.id} deleted successfully.`,
       })
     )
+    .catch((error) => next(error));
+}
+
+function generateMonthlyReport(req, res, next) {
+  const { patientId, month } = req.params;
+  
+  testResultServices
+    .generatePatientReport(patientId, 'month', parseInt(month))
+    .then((report) => res.json({ data: report }))
+    .catch((error) => next(error));
+}
+
+function generateYearlyReport(req, res, next) {
+  const { patientId, year } = req.params;
+  
+  testResultServices
+    .generatePatientReport(patientId, 'year', parseInt(year))
+    .then((report) => res.json({ data: report }))
     .catch((error) => next(error));
 }

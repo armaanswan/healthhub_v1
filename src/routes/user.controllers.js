@@ -84,7 +84,6 @@ function logout(_, res) {
 
 function getAllUsers(req, res, next) {
   const currentUser = req.auth;
-  let roleFilter;
 
   if (currentUser.role === Role.Patient) {
     return res.status(401).json({ message: "Not Authorized!" });
@@ -94,7 +93,13 @@ function getAllUsers(req, res, next) {
     // roleFilter = [Role.Patient];
     queryFilters.role = Role.Patient;
   }
-  const { _page: rawPage, _limit: rawLimit, ...filters } = req.query;
+  const {
+    _page: rawPage,
+    _limit: rawLimit,
+    _sort: sort,
+    _order: order,
+    ...filters
+  } = req.query;
 
   const page = parseInt(rawPage) || 1; // Default to page 1
   const limit = parseInt(rawLimit) || 10; // Default to 10 users per page
@@ -105,7 +110,7 @@ function getAllUsers(req, res, next) {
   }
 
   userServices
-    .getAllUsers(skip, limit, queryFilters)
+    .getAllUsers(skip, limit, queryFilters, [sort, order])
     .then((users) => res.json(users))
     .catch((err) => next(err));
 }
