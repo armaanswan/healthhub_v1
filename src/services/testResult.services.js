@@ -63,7 +63,9 @@ async function getAllTestResults(skip, limit, queryFilters, querySorters) {
   const [sort, order] = querySorters;
   
   const findQuery = Object.entries(queryFilters).reduce((acc, [key, value]) => {
-    if (typeof value === 'string') {
+    if (value === 'true' || value === 'false') {
+      acc[key] = value === 'true';
+    } else if (typeof value === 'string') {
       acc[key] = { $regex: value, $options: 'i' };
     } else {
       acc[key] = value;

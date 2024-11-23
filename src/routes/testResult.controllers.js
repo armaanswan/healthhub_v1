@@ -64,6 +64,7 @@ function getAllTestResults(req, res, next) {
   for (const [key, value] of Object.entries(filters)) {
     queryFilters[key] = value;
   }
+  console.log('QUERY FILTERS:', queryFilters);
 
   testResultServices
     .getAllTestResults(skip, limit, queryFilters, [_sort, _order])

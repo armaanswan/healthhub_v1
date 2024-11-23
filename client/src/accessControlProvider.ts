@@ -17,7 +17,6 @@ ac.grant("Doctor").read("patients").update("patients").read("test-results");
 ac.grant("Staff")
   .read("patients")
   .read("test-results")
-  .create("test-results")
   .update("test-results");
 ac.grant("Patient").read("test-results");
 export const accessControlProvider: AccessControlProvider = {
