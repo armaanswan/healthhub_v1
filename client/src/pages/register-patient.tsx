@@ -43,9 +43,10 @@ export default function RegisterPatient() {
         ...titleStyles,
       }}
     >
-      Your Patient Account has been succesfully created!
+      Patient Account Created Successfully!
     </Typography.Title>
   );
+
   return (
     <AuthPage
       type="login"
@@ -69,13 +70,16 @@ export default function RegisterPatient() {
               backgroundColor: token.colorBgElevated,
             }}
           >
-            <Typography.Text strong>
-              Please, wait for our stuff to confirm your registration and
-              activate the account.
+            <Typography.Text>
+              Thank you for creating an account with HealthHub! Your account is now being reviewed.
             </Typography.Text>
             <br /> <br />
-            <Typography.Text strong>
-              Thank you for your patience.
+            <Typography.Text>
+              Please note that an administrator will review your registration, and you will not be able to access the system until it has been approved.
+            </Typography.Text>
+            <br /> <br />
+            <Typography.Text>
+              We appreciate your patience during this process.
             </Typography.Text>
           </Card>
         </>
