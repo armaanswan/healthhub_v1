@@ -100,7 +100,7 @@ export const UserCreate = () => {
               <Select
                 defaultValue={"draft"}
                 options={[
-                  { value: "Patient", label: "Patient" },
+                  // { value: "Patient", label: "Patient" },
                   { value: "Doctor", label: "Doctor" },
                   { value: "Staff", label: "Staff" },
                   { value: "Admin", label: "Admin" },
