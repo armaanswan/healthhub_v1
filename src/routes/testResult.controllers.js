@@ -69,7 +69,10 @@ function getAllTestResults(req, res, next) {
   testResultServices
     .getAllTestResults(skip, limit, queryFilters, [_sort, _order])
     .then((testResults) => res.json(testResults))
-    .catch((err) => next(err));
+    .catch((err) => {
+      console.error('Error getting test results:', err);
+      next(err);
+    });
 }
 
 function getTestResultById(req, res, next) {

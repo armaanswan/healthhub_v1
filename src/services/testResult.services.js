@@ -65,7 +65,7 @@ async function getAllTestResults(skip, limit, queryFilters, querySorters) {
   const findQuery = Object.entries(queryFilters).reduce((acc, [key, value]) => {
     if (value === 'true' || value === 'false') {
       acc[key] = value === 'true';
-    } else if (typeof value === 'string') {
+    } else if (typeof value === 'string' && !key.toLocaleLowerCase().includes('id')) {
       acc[key] = { $regex: value, $options: 'i' };
     } else {
       acc[key] = value;
@@ -74,6 +74,8 @@ async function getAllTestResults(skip, limit, queryFilters, querySorters) {
   }, {});
   
   const sortObj = sort ? { [sort]: order === "desc" ? -1 : 1 } : {};
+
+  console.log('FIND QUERY:', findQuery);
 
   const testResults = await TestResult.find(findQuery)
     .populate("patientId")
