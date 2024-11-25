@@ -1,30 +1,7 @@
 const db = require("../lib/db");
 const TestResult = db.TestResult;
 const MonitoringSettings = db.MonitoringSettings;
-
-function defineAbnormality(type, result) {
-  switch (type) {
-    case "BGL": {
-      return result > 100;
-    }
-    case "BP": {
-      return result > 130;
-    }
-    case "HR": {
-      return result > 100 || result < 60;
-    }
-    case "BT": {
-      return result > 37.2;
-    }
-    case "CL": {
-      return result > 200;
-    }
-    case "BMI": {
-      return result > 25;
-    }
-  }
-  return false;
-}
+const defineAbnormality = require("../lib/defineAbnormality");
 
 async function createTestResult(testResultParam) {
   const newTestResult = new TestResult({
@@ -34,7 +11,7 @@ async function createTestResult(testResultParam) {
       : undefined,
     isReady: Boolean(testResultParam?.result),
   });
-  
+
   if (newTestResult.isAbnormal && testResultParam.patientId) {
     const monitoring = await MonitoringSettings.find({
       patientId: testResultParam.patientId,
@@ -42,40 +19,43 @@ async function createTestResult(testResultParam) {
     });
 
     if (monitoring.length > 0) {
-      monitoring.forEach(monitoring => {
-        console.log('ABNORMAL TEST RESULT ALERT (CREATE):', {
+      monitoring.forEach((monitoring) => {
+        console.log("ABNORMAL TEST RESULT ALERT (CREATE):", {
           testResult: newTestResult._id,
           patient: testResultParam.patientId,
           doctor: monitoring.doctorId,
           monitoredFunction: testResultParam.examType,
           result: testResultParam.result,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       });
     }
   }
-  
+
   await newTestResult.save();
   return newTestResult;
 }
 
 async function getAllTestResults(skip, limit, queryFilters, querySorters) {
   const [sort, order] = querySorters;
-  
+
   const findQuery = Object.entries(queryFilters).reduce((acc, [key, value]) => {
-    if (value === 'true' || value === 'false') {
-      acc[key] = value === 'true';
-    } else if (typeof value === 'string' && !key.toLocaleLowerCase().includes('id')) {
-      acc[key] = { $regex: value, $options: 'i' };
+    if (value === "true" || value === "false") {
+      acc[key] = value === "true";
+    } else if (
+      typeof value === "string" &&
+      !key.toLocaleLowerCase().includes("id")
+    ) {
+      acc[key] = { $regex: value, $options: "i" };
     } else {
       acc[key] = value;
     }
     return acc;
   }, {});
-  
+
   const sortObj = sort ? { [sort]: order === "desc" ? -1 : 1 } : {};
 
-  console.log('FIND QUERY:', findQuery);
+  console.log("FIND QUERY:", findQuery);
 
   const testResults = await TestResult.find(findQuery)
     .populate("patientId")
@@ -99,7 +79,7 @@ async function getById(id) {
 async function updateTestResult(id, testResultParam) {
   const testResult = await TestResult.findById(id);
   if (!testResult) throw "Test result not found.";
-  
+
   Object.assign(testResult, {
     ...testResultParam,
     isAbnormal: testResultParam.result
@@ -108,23 +88,28 @@ async function updateTestResult(id, testResultParam) {
     isReady: Boolean(testResultParam?.result),
   });
 
-  console.log('TEST RESULT:', testResult.isAbnormal, testResultParam.patientId, testResultParam.examType);
+  console.log(
+    "TEST RESULT:",
+    testResult.isAbnormal,
+    testResultParam.patientId,
+    testResultParam.examType
+  );
 
   if (testResult.isAbnormal && testResultParam.patientId) {
     const monitoring = await MonitoringSettings.find({
       patientId: testResultParam.patientId,
       monitoredFunction: testResultParam.examType,
-    }).populate('doctorId');
+    }).populate("doctorId");
 
     if (monitoring.length > 0) {
-      monitoring.forEach(monitoring => {
-        console.log('ABNORMAL TEST RESULT ALERT (UPDATE):', {
+      monitoring.forEach((monitoring) => {
+        console.log("ABNORMAL TEST RESULT ALERT (UPDATE):", {
           testResult: testResult._id,
           patient: testResultParam.patientId,
           doctor: monitoring.doctorId,
           monitoredFunction: testResultParam.examType,
           result: testResultParam.result,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       });
     }
@@ -142,46 +127,55 @@ async function generatePatientReport(patientId, period, value) {
   const currentDate = new Date();
   let startDate, endDate;
   let isPrediction = false;
-  
-  if (period === 'month') {
+
+  if (period === "month") {
     // For monthly report
     const year = new Date().getFullYear();
     if (value < 1 || value > 12) {
-      throw new Error('Invalid month value. Must be between 1 and 12');
+      throw new Error("Invalid month value. Must be between 1 and 12");
     }
-    
+
     startDate = new Date(year, value - 1, 1);
     endDate = new Date(year, value, 0); // Last day of the month
-    
+
     if (startDate > currentDate) {
-      console.log('Future month requested');
+      console.log("Future month requested");
       isPrediction = true;
       // Get historical data for prediction (last 12 months or 3 years depending on period)
-      const historicalStartDate = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), 1);
+      const historicalStartDate = new Date(
+        currentDate.getFullYear() - 1,
+        currentDate.getMonth(),
+        1
+      );
 
       const historicalData = await TestResult.find({
         patientId: patientId,
         createdDate: {
           $gte: historicalStartDate,
-          $lte: currentDate
+          $lte: currentDate,
         },
-        isReady: true 
+        isReady: true,
       }).sort({ createdDate: 1 });
 
       // Generate simple predictions based on historical trends
-      const predictions = generatePredictions(historicalData, period, startDate, endDate);
+      const predictions = generatePredictions(
+        historicalData,
+        period,
+        startDate,
+        endDate
+      );
 
       return {
-        message: 'Predicted data based on historical trends',
+        message: "Predicted data based on historical trends",
         isPrediction: true,
         data: predictions,
-        confidence: 'low' // Adding confidence level for transparency
+        confidence: "low", // Adding confidence level for transparency
       };
     }
-  } else if (period === 'year') {
+  } else if (period === "year") {
     // For yearly report
     if (value > currentDate.getFullYear()) {
-      console.log('Future year requested');
+      console.log("Future year requested");
       isPrediction = true;
       // Get historical data for prediction (last 3 years)
       const historicalStartDate = new Date(currentDate.getFullYear() - 3, 0, 1);
@@ -190,22 +184,27 @@ async function generatePatientReport(patientId, period, value) {
         patientId: patientId,
         createdDate: {
           $gte: historicalStartDate,
-          $lte: currentDate
+          $lte: currentDate,
         },
-        isReady: true 
+        isReady: true,
       }).sort({ createdDate: 1 });
 
       // Generate simple predictions based on historical trends
-      const predictions = generatePredictions(historicalData, period, startDate, endDate);
+      const predictions = generatePredictions(
+        historicalData,
+        period,
+        startDate,
+        endDate
+      );
 
       return {
-        message: 'Predicted data based on historical trends',
+        message: "Predicted data based on historical trends",
         isPrediction: true,
         data: predictions,
-        confidence: 'low' // Adding confidence level for transparency
+        confidence: "low", // Adding confidence level for transparency
       };
     }
-    
+
     startDate = new Date(value, 0, 1);
     endDate = new Date(value, 11, 31);
   } else {
@@ -216,42 +215,42 @@ async function generatePatientReport(patientId, period, value) {
     patientId: patientId,
     createdDate: {
       $gte: startDate,
-      $lte: endDate
+      $lte: endDate,
     },
-    isReady: true 
+    isReady: true,
   })
-  .populate('patientId', 'firstName lastName')
-  .sort({ createdDate: 1 });
+    .populate("patientId", "firstName lastName")
+    .sort({ createdDate: 1 });
 
   return {
     patientId,
     period: {
       type: period,
-      value: value
+      value: value,
     },
     dateRange: {
       from: startDate,
-      to: endDate
+      to: endDate,
     },
     totalTests: testResults.length,
-    testResults
+    testResults,
   };
 }
 
 function generatePredictions(historicalData, period, startDate, endDate) {
-  console.log('HISTORICAL DATA:', historicalData);
+  console.log("HISTORICAL DATA:", historicalData);
   if (!historicalData.length) return [];
-  
+
   // Group historical data by exam type
   const groupedData = historicalData.reduce((acc, item) => {
     if (!acc[item.examType]) acc[item.examType] = [];
     acc[item.examType].push({
       result: item.result,
-      date: item.createdDate
+      date: item.createdDate,
     });
     return acc;
   }, {});
-  console.log('GROUPED DATA:', groupedData);
+  console.log("GROUPED DATA:", groupedData);
 
   // Calculate simple linear trend for each exam type
   const predictions = [];
@@ -260,19 +259,19 @@ function generatePredictions(historicalData, period, startDate, endDate) {
 
     // Calculate average change over time
     const avgChange = calculateAverageTrend(data);
-    
+
     // Generate predicted value
     const lastValue = data[data.length - 1].result;
     const timeDiff = startDate - data[data.length - 1].date;
     const monthsDiff = timeDiff / (1000 * 60 * 60 * 24 * 30);
-    
-    const predictedValue = lastValue + (avgChange * monthsDiff);
-    
+
+    const predictedValue = lastValue + avgChange * monthsDiff;
+
     predictions.push({
       examType,
       result: Math.round(predictedValue * 100) / 100, // Round to 2 decimal places
       predictedDate: startDate,
-      isAbnormal: defineAbnormality(examType, predictedValue)
+      isAbnormal: defineAbnormality(examType, predictedValue),
     });
   });
 
@@ -282,11 +281,12 @@ function generatePredictions(historicalData, period, startDate, endDate) {
 function calculateAverageTrend(data) {
   const changes = [];
   for (let i = 1; i < data.length; i++) {
-    const timeDiff = (data[i].date - data[i-1].date) / (1000 * 60 * 60 * 24 * 30); // Convert to months
-    const valueDiff = data[i].result - data[i-1].result;
+    const timeDiff =
+      (data[i].date - data[i - 1].date) / (1000 * 60 * 60 * 24 * 30); // Convert to months
+    const valueDiff = data[i].result - data[i - 1].result;
     changes.push(valueDiff / timeDiff);
   }
-  
+
   return changes.reduce((sum, change) => sum + change, 0) / changes.length;
 }
 

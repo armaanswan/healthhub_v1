@@ -1,26 +1,23 @@
 import { Show, TextField, useModalForm } from "@refinedev/antd";
 import { useGetIdentity, useList, useMany, useShow } from "@refinedev/core";
-import { Button, Col, Form, Input, Modal, Row, Select, Tag, Typography } from "antd";
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Tag,
+  Typography,
+} from "antd";
 import dayjs from "dayjs";
 import { User } from "../../lib/api/schemas";
 import { useEffect } from "react";
 import { USER_ROLE } from "../../authProvider";
+import { medicalTestOptions } from "../../lib/medical-test-options";
 
 const { Title } = Typography;
-
-const medicalTestOptions = [
-  {
-    value: "BGL",
-    label: "Blood Glucose Level (mg/dL)",
-  },
-  {
-    value: "BP",
-    label: "Blood Pressure (mmHg)",
-  },
-  { value: "BT", label: "Body Temperature (°C)" },
-  { value: "CL", label: "Cholesterol Level (mg/dL)" },
-  { value: "BMI", label: "Body Mass Index (kg/m²)" },
-] ;
 
 export const PatientShow = () => {
   const { query } = useShow({});
@@ -43,14 +40,12 @@ export const PatientShow = () => {
         value: record?.id,
       },
       {
-        field: "doctorId", 
+        field: "doctorId",
         operator: "eq",
         value: user?.id,
-      }
+      },
     ],
   });
-
-
 
   const {
     modalProps: prescriptionModalProps,
@@ -89,7 +84,9 @@ export const PatientShow = () => {
             {defaultButtons}
             {role === "Doctor" && (
               <>
-                <Button onClick={() => monitoringModalShow()}>Setup Monitoring</Button>
+                <Button onClick={() => monitoringModalShow()}>
+                  Setup Monitoring
+                </Button>
                 <Button type="primary" onClick={() => prescriptionModalShow()}>
                   Make Prescription
                 </Button>
@@ -121,7 +118,10 @@ export const PatientShow = () => {
           <>
             <Title level={5}>{"Monitorings"}</Title>
             {monitorings.data.map((monitoring) => (
-              <Tag key={monitoring.id} style={{ marginRight: "8px", marginBottom: "8px" }}>
+              <Tag
+                key={monitoring.id}
+                style={{ marginRight: "8px", marginBottom: "8px" }}
+              >
                 {monitoring.monitoredFunction}
               </Tag>
             ))}
